@@ -60,7 +60,7 @@ in `body` element, and
       degung: [0, 3.863, 4.98, 7.02, 10.883]
     };
 ```
-in `script` element. (sorry if I misrepresent them, the resources of world music scales in internet are very limited.)
+in `script` element. (Sorry if I misrepresent them, the resources of world music scales in internet are very limited.)
 
 4. **Automatic coloring and decimal 12ET/ratio notation labeling**
 
