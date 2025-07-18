@@ -20,8 +20,8 @@ The codes are in the `_posts` folder.
 
 They can be configured here:
 ```js
-const numOctaves = {value}; // number of octaves, e.g. 4
-const baseOctave = {value}; // based on 'baseFreq'. e.g. -2
+const numOctaves = 6; // number of octaves
+const baseOctave = -1; // base octave, based on 'baseFreq'
 ```
 3. **Scale options: configurable defined scales or linear continuous pad**
 
