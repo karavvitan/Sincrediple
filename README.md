@@ -13,7 +13,7 @@ Try them:
 
 The codes are in the `_posts` folder.
 
-## Featured:
+## Featured
 
 1. **XY dimensionality: X for pitch, Y for the volume**
 2. **Multioctave**
