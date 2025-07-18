@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stretched Continuous</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%; background: #111; font-family: sans-serif; overflow: hidden;
+    }
+    body { display: flex; }
+    #scrollbarZone { width: 60px; background: #222; overflow-y: scroll; }
+    #scrollbarZone > div { width: 1px; }
+    #scaleButtonContainer {
+      position: absolute; bottom: 10px; left: 40px; z-index: 10;
+    }
+    #scaleSelect { font-size: 0.9em; padding: 2px; }
+    #padContainer {
+      flex: 1; position: relative; overflow: hidden; height: 100%;
+    }
+    .noteOverlay {
+      position: absolute; width: 100%; display: flex; flex-direction: column-reverse;
+      pointer-events: none; z-index: 0; transform: translateY(0px);
+    }
+    .octave-row {
+      flex: none; height: 120px; display: flex; border-top: solid 1px; border-bottom: solid 1px;
+    }
+    .note-zone {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 0.8em; color: white;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+    .pad {
+      position: absolute; left: 0; width: 100%; height: 100%;
+      touch-action: none; z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="scrollbarZone"></div>
+  <div id="scaleButtonContainer">
+    <select id="scaleSelect">
+      <option value="major">Major</option>
+      <option value="continuous">Continuous</option>
+    </select>
+  </div>
+
+  <div id="padContainer"></div>
+
+  <script>
+  const scalePresets = {
+    major: [0, 2, 4, 5, 7, 9, 11]
+  };
+
+  const baseFreq = 261.63;
+  const numOctaves = 4;
+  const baseOctave = 0;
+  const rowHeight = 120;
+
+  const container = document.getElementById('padContainer');
+  const scaleSelect = document.getElementById('scaleSelect');
+  const scrollbarZone = document.getElementById('scrollbarZone');
+
+  function getFreq(semitoneOffset) {
+    return baseFreq * Math.pow(2, semitoneOffset / 12);
+  }
+
+function getFreqFromXY(x, y, width, height, scale, minOct, maxOct) {
+  const octaveCount = maxOct - minOct + 1;
+
+  if (scale === 'continuous') {
+    const rowsPerOctave = 2;
+    const totalRows = octaveCount * rowsPerOctave;
+    const rowHeight = height / totalRows;
+
+    const invertedY = height - y;
+    const rowIndex = Math.floor(invertedY / rowHeight); // Semakin atas => index lebih besar
+    const semitoneBase = rowIndex * 6;
+    const semitoneOffset = (x / width) * 6;
+    const semitone = semitoneBase + semitoneOffset;
+
+    const yVolume = (rowHeight - (y % rowHeight)) / rowHeight;
+
+    return { freq: getFreq(semitone), volume: yVolume };
+  } else {
+    const octaveHeight = height / octaveCount;
+
+    const invertedY = height - y;
+    const octaveIndex = Math.floor(invertedY / octaveHeight); // semakin atas => oktaf lebih tinggi
+    const octaveY = invertedY % octaveHeight;
+    const yVolume = (rowHeight - (y % rowHeight)) / rowHeight;
+
+    const index = Math.floor(x / width * scale.length);
+    const safeIndex = Math.max(0, Math.min(index, scale.length - 1));
+    const semitone = scale[safeIndex] + octaveIndex * 12;
+    return { freq: getFreq(semitone), volume: yVolume };
+  }
+}
+
+  function applyEnvelope(gainNode, audioCtx, volume, attack = 0.05, decay = 0.1, sustain = 0.7, release = 0.9) {
+    const now = audioCtx.currentTime;
+    gainNode.gain.cancelScheduledValues(now);
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(volume, now + attack);
+    gainNode.gain.linearRampToValueAtTime(volume * sustain, now + attack + decay);
+    return () => {
+      const stopTime = audioCtx.currentTime;
+      gainNode.gain.cancelScheduledValues(stopTime);
+      gainNode.gain.setValueAtTime(gainNode.gain.value, stopTime);
+      gainNode.gain.linearRampToValueAtTime(0, stopTime + release);
+    };
+  }
+
+  function generateImpulseResponse(audioCtx, duration = 0.01, decay = 0.01) {
+    const rate = audioCtx.sampleRate;
+    const length = rate * duration;
+    const impulse = audioCtx.createBuffer(2, length, rate);
+    for (let ch = 0; ch < 2; ch++) {
+      const channelData = impulse.getChannelData(ch);
+      for (let i = 0; i < length; i++) {
+        channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+      }
+    }
+    return impulse;
+  }
+
+  function renderPad(scaleName) {
+    const scale = scaleName === 'continuous' ? 'continuous' : scalePresets[scaleName];
+    container.innerHTML = '';
+
+    const pad = document.createElement('div');
+    pad.className = 'pad';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'noteOverlay';
+
+    if (scale === 'continuous') {
+      for (let o = 0; o < numOctaves; o++) {
+        for (let r = 0; r < 2; r++) {
+          const octaveRow = document.createElement('div');
+          octaveRow.className = 'octave-row';
+          for (let i = 0; i < 6; i++) {
+            const semitone = r * 6 + i;
+            const note = document.createElement('div');
+            note.className = 'note-zone';
+            const hue = ((o * 12 + semitone) % 12) / 12 * 360;
+            note.style.backgroundColor = `hsl(${hue}, 70%, 55%)`;
+            note.textContent = (o * 12 + semitone) % 12;
+            octaveRow.appendChild(note);
+          }
+          overlay.appendChild(octaveRow);
+        }
+      }
+    } else {
+      for (let o = 0; o < numOctaves; o++) {
+        const octaveRow = document.createElement('div');
+        octaveRow.className = 'octave-row';
+        for (let i = 0; i < scale.length; i++) {
+          const note = document.createElement('div');
+          note.className = 'note-zone';
+          const semitone = scale[i] % 12;
+          const hue = (semitone / 12) * 360;
+          note.style.backgroundColor = `hsl(${hue}, 70%, 55%)`;
+          note.textContent = semitone;
+          octaveRow.appendChild(note);
+        }
+        overlay.appendChild(octaveRow);
+      }
+    }
+
+    const rowCount = (scale === 'continuous') ? numOctaves * 2 : numOctaves;
+    scrollbarZone.innerHTML = '<div style="height:' + (rowHeight * rowCount) + 'px;"></div>';
+
+    overlay.style.transform = 'translateY(0px)';
+    container.appendChild(overlay);
+    container.appendChild(pad);
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const reverb = audioCtx.createConvolver();
+    reverb.buffer = generateImpulseResponse(audioCtx);
+    reverb.normalize = true;
+
+    const masterGain = audioCtx.createGain();
+    masterGain.gain.value = 25;
+
+    masterGain.connect(reverb);
+    reverb.connect(audioCtx.destination);
+
+    const activeVoices = new Map();
+
+    pad.addEventListener('pointerdown', e => {
+      audioCtx.resume();
+      const id = e.pointerId;
+      const rect = pad.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top + scrollbarZone.scrollTop;
+      const { freq, volume } = getFreqFromXY(x, y, rect.width, rowHeight * rowCount, scale, baseOctave, baseOctave + numOctaves - 1);
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+      filter.type = 'allpass';
+      filter.frequency.setValueAtTime(500 + y * 4, audioCtx.currentTime);
+
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.frequency.value = 0;
+      lfoGain.gain.value = 1;
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(masterGain);
+
+      osc.start();
+      lfo.start();
+
+      const release = applyEnvelope(gain, audioCtx, volume);
+      activeVoices.set(id, { osc, gain, lfo, release });
+    });
+
+    pad.addEventListener('pointerup', e => {
+      const id = e.pointerId;
+      const voice = activeVoices.get(id);
+      if (voice) {
+        voice.release();
+        voice.osc.stop(audioCtx.currentTime + 1);
+        voice.lfo.stop(audioCtx.currentTime + 1);
+        activeVoices.delete(id);
+      }
+    });
+
+    pad.addEventListener('pointermove', e => {
+      const id = e.pointerId;
+      const voice = activeVoices.get(id);
+      if (voice && e.pressure > 0) {
+        const rect = pad.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top + scrollbarZone.scrollTop;
+        const { freq, volume } = getFreqFromXY(x, y, rect.width, rowHeight * rowCount, scale, baseOctave, baseOctave + numOctaves - 1);
+        voice.osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        voice.gain.gain.setTargetAtTime(volume, audioCtx.currentTime, 0.05);
+      }
+    });
+  }
+
+  scrollbarZone.addEventListener('scroll', () => {
+    const scrollY = scrollbarZone.scrollTop;
+    const overlay = container.querySelector('.noteOverlay');
+    if (overlay) overlay.style.transform = `translateY(${-scrollY}px)`;
+  });
+
+  scaleSelect.addEventListener('change', () => {
+    renderPad(scaleSelect.value);
+  });
+
+  renderPad('major');
+</script>
+</body>
+</html>

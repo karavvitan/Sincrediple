@@ -1,0 +1,219 @@
+---
+date: 2025-05-10
+title: Basic
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sincrediple Basic</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #111;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+    }
+
+    #scrollbarZone {
+      width: 60px;
+      background: #222;
+      overflow-y: scroll;
+    }
+
+    #scrollbarZone > div {
+      width: 1px;
+    }
+
+    #scaleButtonContainer {
+      position: absolute;
+      bottom: 10px;
+      left: 40px;
+      z-index: 10;
+    }
+
+    #scaleSelect {
+      font-size: 0.9em;
+      padding: 2px;
+    }
+
+    #padContainer {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .noteOverlay {
+      position: absolute;
+      width: 100%;
+      display: flex;
+      flex-direction: column-reverse;
+      pointer-events: none;
+      z-index: 0;
+      transform: translateY(0px);
+    }
+
+    .octave-row {
+      flex: none;
+      height: 120px;
+      display: flex;
+      border-top: solid 1px;
+      border-bottom: solid 1px;
+    }
+
+    .note-zone {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.8em;
+      color: white;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .pad {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="scrollbarZone"></div>
+
+  <div id="scaleButtonContainer">
+    <select id="scaleSelect" title="Select a Scale">
+      <option value="major">Major</option>
+      <option value="blues">Blues Minor</option>
+      <option value="continuous">Continuous</option>
+    </select>
+  </div>
+
+  <div id="padContainer"></div>
+
+  <script>
+    const scalePresets = {
+      major: [0, 2, 4, 5, 7, 9, 11],
+      blues: [0, 3, 5, 6, 7, 10]
+    };
+
+    const baseFreq = 261.63; // C4
+    const numOctaves = 6;
+    const baseOctave = -2;
+    const rowHeight = 120;
+
+    const container = document.getElementById('padContainer');
+    const scaleSelect = document.getElementById('scaleSelect');
+    const scrollbarZone = document.getElementById('scrollbarZone');
+
+    function getFreq(semitoneOffset) {
+      return baseFreq * Math.pow(2, semitoneOffset / 12);
+    }
+
+    function getFreqFromXY(x, y, width, height, scale, minOct, maxOct) {
+      const octaveHeight = height / (maxOct - minOct + 1);
+      const octaveIndex = maxOct - Math.floor(y / octaveHeight);
+      const octaveY = y % octaveHeight;
+      const yVolume = 1 - (octaveY / octaveHeight);
+
+      if (scale === 'continuous') {
+        const semitone = (x / width) * 12 + octaveIndex * 12;
+        return { freq: getFreq(semitone), volume: yVolume };
+      } else {
+        const index = Math.floor(x / width * scale.length);
+        const safeIndex = Math.max(0, Math.min(index, scale.length - 1));
+        const semitone = scale[safeIndex] + octaveIndex * 12;
+        return { freq: getFreq(semitone), volume: yVolume };
+      }
+    }
+
+    function renderPad(scaleName) {
+      const scale = scaleName === 'continuous' ? 'continuous' : scalePresets[scaleName];
+      container.innerHTML = '';
+
+      const pad = document.createElement('div');
+      pad.className = 'pad';
+
+      const overlay = document.createElement('div');
+      overlay.className = 'noteOverlay';
+
+      for (let o = 0; o < numOctaves; o++) {
+        const octaveRow = document.createElement('div');
+        octaveRow.className = 'octave-row';
+        const octave = baseOctave + o;
+        for (let i = 0; i < (scale === 'continuous' ? 12 : scale.length); i++) {
+          const note = document.createElement('div');
+          note.className = 'note-zone';
+          const semitone = scale === 'continuous' ? i : scale[i] % 12;
+          const hue = (semitone / 12) * 360;
+          note.style.backgroundColor = `hsl(${hue}, 70%, 55%)`;
+          note.textContent = semitone;
+          octaveRow.appendChild(note);
+        }
+        overlay.appendChild(octaveRow);
+      }
+
+      overlay.style.transform = 'translateY(0px)';
+      container.appendChild(overlay);
+      container.appendChild(pad);
+
+      // Audio logic
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      gain.gain.value = 0;
+      osc.start();
+
+      function updateSound(e) {
+  const rect = pad.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top + scrollbarZone.scrollTop; // koreksi Y dengan scrollTop
+  const { freq, volume } = getFreqFromXY(x, y, rect.width, rowHeight * numOctaves, scale, baseOctave, baseOctave + numOctaves - 1);
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+}
+
+      pad.addEventListener('pointerdown', e => {
+        audioCtx.resume();
+        updateSound(e);
+      });
+
+      pad.addEventListener('pointermove', e => {
+        if (e.pressure > 0) updateSound(e);
+      });
+
+      pad.addEventListener('pointerup', () => {
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+      });
+    }
+
+    scrollbarZone.innerHTML = '<div style="height:' + (rowHeight * numOctaves) + 'px;"></div>';
+    scrollbarZone.addEventListener('scroll', () => {
+      const scrollY = scrollbarZone.scrollTop;
+      const overlay = container.querySelector('.noteOverlay');
+      if (overlay) overlay.style.transform = `translateY(${-scrollY}px)`;
+    });
+
+    scaleSelect.addEventListener('change', () => {
+      renderPad(scaleSelect.value);
+    });
+
+    renderPad('major');
+  </script>
+</body>
+</html>
