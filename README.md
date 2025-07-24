@@ -6,10 +6,10 @@ This is an app for playing music based on scale presets. Good for fun playing, e
 
 Try them:
 
-1. [Basic](https://karavitan.github.io/Sincrediple/2025/05/10/basic.html)
-2. [Advanced Audio Logic 12ET Notation](https://karavitan.github.io/Sincrediple/2025/06/15/advancedaudio12et.html)
-3. [Advanced Audio Logic Ratio Notation](https://karavitan.github.io/Sincrediple/2025/06/15/advancedaudioratio.html)
-4. ["Every octave in continuous mode is divided into two rows" version](https://karavitan.github.io/Sincrediple/2025/07/18/stretched_continuous.html)
+1. [Basic](https://karavvitan.github.io/Sincrediple/2025/05/10/basic.html)
+2. [Advanced Audio Logic 12ET Notation](https://karavvitan.github.io/Sincrediple/2025/06/15/advancedaudio12et.html)
+3. [Advanced Audio Logic Ratio Notation](https://karavvitan.github.io/Sincrediple/2025/06/15/advancedaudioratio.html)
+4. ["Every octave in continuous mode is divided into two rows" version](https://karavvitan.github.io/Sincrediple/2025/07/18/stretched_continuous.html)
 
 The codes are in the `_posts` folder.
 
