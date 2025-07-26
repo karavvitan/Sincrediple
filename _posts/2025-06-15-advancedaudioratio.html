@@ -175,10 +175,10 @@ title: advancedaudiojust
         const gain = audioCtx.createGain();
         const filter = audioCtx.createBiquadFilter();
 
-        osc.type = 'sine';
+        osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
 
-        filter.type = 'allpass';
+        filter.type = 'lowpass';
         filter.frequency.setValueAtTime(500 + y * 4, audioCtx.currentTime);
 
         const lfo = audioCtx.createOscillator();
