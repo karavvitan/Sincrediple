@@ -2,7 +2,7 @@
 
 *The codes were created by ChatGPT. (I don't understand coding yet, esp. JavaScript.)*
 
-This is a HTML app for playing music based on scale presets. Good for fun playing, education, and for beginners.
+This is an HTML app for playing music based on scale presets. Good for fun playing, education, and for beginners.
 
 Try them:
 
