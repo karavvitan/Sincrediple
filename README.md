@@ -47,7 +47,7 @@ Example:
 ```html
   <div id="scaleButtonContainer">
     <select id="scaleSelect">
-      <option value="blues">Blues</option>
+      <option value="bluesMinor">Blues Minor</option>
       <option value="tizitaminor">Tizita Minor</option>
       <option value="rast">Rast</option>
       <option value="iwato">Iwato</option>
@@ -61,11 +61,11 @@ in `body` element, and (for 12-ET notation based codes)
 
 ```js
     const scalePresets = {
-      blues: [0, 3, 5, 6, 7, 10],
+      bluesMinor: [0, 3, 5, 6, 7, 10],
       tizitaminor: [0, 2.04, 3.16, 7.02, 8.14],
-      rast: [0, 2, 3.5, 5, 7, 9, 10.5],
+      rast: [0, 2.04, 3.55, 4.98, 7.02, 8.58, 9.97],
       iwato: [0, 1, 5, 6, 10],
-      degung: [0, 3.863, 4.98, 7.02, 10.883]
+      degung: [0, 4, 5, 7, 11]
     };
 ```
 
