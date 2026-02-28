@@ -7,9 +7,9 @@ Good for fun playing, education, and for beginners.
 
 Try them:
 
-1. [Real 12-ET Notation Based (v0)](https://karavvitan.github.io/Sincrediple/real-12et/)
-2. [Ratio Notation Based (v0)](https://karavvitan.github.io/Sincrediple/ratio/)
-3. ["Every octave in continuous mode is divided into two rows" version (v1)](https://karavvitan.github.io/Sincrediple/splitted-continuous/)
+1. [Real 12-ET Notation Based (v0)](https://karavvitan.github.io/Sincrediple/real-12et/index.html)
+2. [Ratio Notation Based (v0)](https://karavvitan.github.io/Sincrediple/ratio/index.html)
+3. ["Every octave in continuous mode is divided into two rows" version (v1)](https://karavvitan.github.io/Sincrediple/splitted-continuous/index.html)
 
 The source codes are in `/docs` folder (named so for easy deploying to gh-pages).
 
