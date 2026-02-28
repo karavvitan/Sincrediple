@@ -55,7 +55,7 @@ Example:
   </div>
 ```
 
-in `body` element, and
+in `<body>` element, and
 
 ```js
     const scalePresets = {
@@ -65,7 +65,7 @@ in `body` element, and
     };
 ```
 
-in `script` element.
+in `<script>` element.
 
 4. **Automatic coloring and real ET/ratio notation labeling**
 
