@@ -1,6 +1,6 @@
 > [!NOTE]
-> - Sorry for my bad English
-> - The codes were created by ChatGPT. (I don't understand coding yet, esp. JavaScript.)
+> - Sorry for my bad English.
+> - The codes were created by ChatGPT. I don't understand coding yet, (especially when I first made this project).
 
 This is an HTML app for playing music based on scale presets.
 Good for fun playing, education, and for beginners.
