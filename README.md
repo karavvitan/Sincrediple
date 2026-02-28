@@ -2,7 +2,7 @@
 > - Sorry for my bad English.
 > - The codes were created by ChatGPT. I don't understand coding yet, (especially when I first made this project).
 
-This is an HTML app for playing music based on scale presets.
+This is a simple HTML app for playing music based on scale presets.
 Good for fun playing, education, and for beginners.
 
 Try them:
@@ -10,6 +10,8 @@ Try them:
 1. [Real 12-ET Notation Based (v0)](https://karavitan.github.io/Sincrediple/real-12et/)
 2. [Ratio Notation Based (v0)](https://karavitan.github.io/Sincrediple/ratio/)
 3. ["Every octave in continuous mode is divided into two rows" version (v1)](https://karavitan.github.io/Sincrediple/splitted-continuous/)
+
+The source codes are in `/docs` folder (named so for easy deploying to gh-pages).
 
 ## Featured
 
@@ -25,7 +27,7 @@ const baseOctave = -1; // base octave, based on 'baseFreq'
 
 3. **Scale options: configurable defined scales or perceptionally linear continuous pad**
 
-(This explanation is mainly for **v1**—**v2**)  
+(This explanation is mainly for **v0**—**v1**)  
 To add or configure scales, look at
 
 ```html
