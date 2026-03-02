@@ -10,6 +10,7 @@ Try them:
 1. [Real 12-ET Notation Based (v0)](https://karavvitan.github.io/Sincrediple/real-12et/index.html)
 2. [Ratio Notation Based (v0)](https://karavvitan.github.io/Sincrediple/ratio/index.html)
 3. ["Every octave in continuous mode is divided into two rows" version (v1)](https://karavvitan.github.io/Sincrediple/splitted-continuous/index.html)
+4. [`simflex`, each scale can have their own ET system (v2)](https://karavvitan.github.io/Sincrediple/simflex/index.html)
 
 The source codes are in `/docs` folder (named so for easy deploying to gh-pages).
 
