@@ -15,6 +15,10 @@ The source codes are in `/docs` folder (named so for easy deploying to gh-pages)
 
 ## Featured
 
+> [!NOTE]
+Variants may have different configurations.
+Check out `docs.md` in their respective folders for their respective documentations.
+
 1. **XY dimensionality: X for the pitch, Y for the volume**
 2. **Multioctave**
 
