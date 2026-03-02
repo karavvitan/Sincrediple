@@ -16,8 +16,10 @@ The source codes are in `/docs` folder (named so for easy deploying to gh-pages)
 ## Featured
 
 > [!NOTE]
-Variants may have different configurations.
-Check out `docs.md` in their respective folders for their respective documentations.
+> Variants may have different configurations.
+> Check out `docs.md` in their respective folders for their respective documentations.
+>
+> This explanation is mainly for **v0**—**v1**.
 
 1. **XY dimensionality: X for the pitch, Y for the volume**
 2. **Multioctave**
@@ -31,7 +33,6 @@ const baseOctave = -1; // base octave, based on 'baseFreq'
 
 3. **Scale options: configurable defined scales or perceptionally linear continuous pad**
 
-(This explanation is mainly for **v0**—**v1**)  
 To add or configure scales, look at
 
 ```html
