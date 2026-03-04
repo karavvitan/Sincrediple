@@ -122,7 +122,7 @@
           const tone = scale[i];
           const hue = (tone / ET) * 360;
           note.style.backgroundColor = `hsl(${hue}, 70%, 55%)`;
-          note.textContent = tone;
+          note.textContent = +tone.toFixed(3);
           octaveRow.appendChild(note);
         }
         overlay.appendChild(octaveRow);
