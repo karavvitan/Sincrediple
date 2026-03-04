@@ -39,7 +39,8 @@
   <div id="scrollbarZone"></div>
   <div id="scaleButtonContainer">
     <select id="scaleSelect">
-      <option value="major">Major</option>
+      <option value="minor">Minor</option>
+      <option value="minorRatio">Minor Ratio</option>
     </select>
   </div>
 
@@ -47,7 +48,8 @@
 
   <script>
     const scalePresets = {
-      major: [12, [0, 2, 4, 5, 7, 9, 11]],
+      minor: [12, [0, 2, 3, 5, 7, 8, 10]],
+      minorRatio: [0, [1/1, 9/8, 6/5, 4/3, 3/2, 8/5, 9/5]],
     };
 
     const baseFreq = 261.63;
@@ -59,10 +61,6 @@
     const scaleSelect = document.getElementById("scaleSelect");
     const scrollbarZone = document.getElementById("scrollbarZone");
 
-    function getFreq(toneOffset, ET) {
-      return baseFreq * Math.pow(2, toneOffset / ET);
-    }
-
     function getFreqFromXY(x, y, width, height, ET, scale, minOct, maxOct) {
       const octaveHeight = height / (maxOct - minOct + 1);
       const octaveIndex = maxOct - Math.floor(y / octaveHeight);
@@ -71,8 +69,9 @@
 
       const index = Math.floor(x / width * scale.length);
       const safeIndex = Math.max(0, Math.min(index, scale.length - 1));
-      const tone = scale[safeIndex] + octaveIndex * ET;
-      return { freq: getFreq(tone, ET), volume: yVolume };
+      const ratio = ET === 0 ? scale[safeIndex] : Math.pow(2, scale[safeIndex] / ET);
+      const freq = baseFreq * ratio * Math.pow(2, octaveIndex);
+      return { freq: freq, volume: yVolume };
     }
 
     function applyEnvelope(gainNode, audioCtx, volume, attack = 0.05, decay = 0.1, sustain = 0.7, release = 0.9) {
@@ -120,7 +119,7 @@
           const note = document.createElement("div");
           note.className = "note-zone";
           const tone = scale[i];
-          const hue = (tone / ET) * 360;
+          const hue = ET === 0 ? tone * 360 : (tone / ET) * 360;
           note.style.backgroundColor = `hsl(${hue}, 70%, 55%)`;
           note.textContent = +tone.toFixed(3);
           octaveRow.appendChild(note);
@@ -217,7 +216,7 @@
       renderPad(scaleSelect.value);
     });
 
-    renderPad("major");
+    renderPad("minor");
   </script>
 </body>
 </html>
