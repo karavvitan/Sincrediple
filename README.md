@@ -1,4 +1,5 @@
 > [!NOTE]
+> - This repository is deprecated in favor of more developed fork of it: [synflexiple](https://github.com/karavvitan/synflexiple).
 > - Sorry for my bad English.
 > - The codes were created by ChatGPT. I don't understand coding yet (especially when I first made this project).
 
